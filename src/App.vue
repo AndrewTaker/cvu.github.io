@@ -1,61 +1,50 @@
-<script setup>
-import { ref, onMounted } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useDadata } from './composables/useDadata';
+import DataTable from './components/DataTable.vue'
 
-const apiKey = ref(localStorage.getItem('dadata_api_key') || '');
-const query = ref('');
-const results = ref(null);
-const endpoint = ref('suggest/address'); // Default endpoint
+const { apiKey, apiSecret, data, saveApiKey, fetchData } = useDadata();
+const queries = ref<string>('');
 
-const saveApiKey = () => {
-  localStorage.setItem('dadata_api_key', apiKey.value);
-};
+const fetchMultipleData = async () => {
+	if (!queries.value) return;
 
-const fetchData = async () => {
-  if (!apiKey.value) {
-    alert('Please enter your API key!');
-    return;
-  }
+	const queryList = queries.value
+		.split(/[\n,]/)
+		.map(q => q.trim())
+		.filter(q => q.length > 0);
 
-  const url = `https://suggestions.dadata.ru/suggestions/api/4_1/rs/${endpoint.value}`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Token ${apiKey.value}`
-    },
-    body: JSON.stringify({ query: query.value })
-  });
+	const allSuggestions: Suggestion[] = [];
+	for (const query of queryList) {
+		const response = await fetchData(query);
+		if (response?.suggestions) {
+			allSuggestions.push(...response.suggestions);
+		}
+	}
 
-  results.value = await response.json();
+	data.value = { suggestions: allSuggestions };
 };
 </script>
 
 <template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-xl font-bold mb-4">DaData API Explorer</h1>
+	<div class="container mx-auto p-4">
+		<h1 class="text-xl font-bold mb-4">DaData API Explorer</h1>
 
-    <label class="block mb-2">API Key:</label>
-    <input v-model="apiKey" @input="saveApiKey" class="border p-2 w-full mb-4" placeholder="Enter your API key" />
 
-    <label class="block mb-2">Endpoint:</label>
-    <select v-model="endpoint" class="border p-2 w-full mb-4">
-      <option value="suggest/address">Address Suggestion</option>
-      <option value="suggest/name">Name Suggestion</option>
-      <option value="suggest/email">Email Suggestion</option>
-    </select>
+		<label class="block mb-2">API Key:</label>
+		<input v-model="apiKey" @input="saveApiKey" class="border w-1/2 p-2 mb-4" placeholder="Enter your API key" />
 
-    <label class="block mb-2">Query:</label>
-    <input v-model="query" class="border p-2 w-full mb-4" placeholder="Enter query" />
+		<label class="block mb-2">Query:</label>
+		<textarea v-model="queries" class="border p-2 w-1/2 mb-4" placeholder="Enter query"></textarea>
+		<button @click="fetchMultipleData" class="bg-blue-500 text-white px-4 py-2">Fetch</button>
 
-    <button @click="fetchData" class="bg-blue-500 text-white px-4 py-2">Fetch</button>
-
-    <pre v-if="results" class="mt-4 p-4">{{ results }}</pre>
-  </div>
+		<div v-if="data" class="container mx-auto p-4">
+			<DataTable :data="data.suggestions" />
+		</div>
+		<p v-else>no data x(</p>
+	</div>
 </template>
 
 <style>
-/* Optional styles */
-body {
-  font-family: Arial, sans-serif;
-}
+@import "tailwindcss";
 </style>
