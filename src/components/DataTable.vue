@@ -73,7 +73,11 @@ const downloadCSV = () => {
 
 		<div class="mb-4">
 			<div class="space-x-2">
-				<span v-for="tag in availableTags" :key="tag" class="bg-gray-200 px-2 py-1 rounded-full text-sm">
+				<span v-for="tag in availableTags" :key="tag"
+					class="bg-gray-200 px-2 py-1 rounded-full text-sm hover:bg-sky-700" :class="{
+						'bg-gray-200': !selectedTags.includes(tag.tag),
+						'bg-sky-700': selectedTags.includes(tag.tag)
+					}">
 					<button @click="toggleTag(tag.tag)" class="text-red-500 ml-1">{{ tag.tag }}</button>
 				</span>
 			</div>
@@ -81,14 +85,14 @@ const downloadCSV = () => {
 
 		<table class="min-w-full border-collapse table-auto">
 			<thead>
-				<tr>
+				<tr class="sticky top-0">
 					<th v-for="column, index in selectedColumns" :key="index" class="border p-2">
 						{{ getTagLabel(column) }}
 					</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, rowIndex) in props.data" :key="rowIndex">
+				<tr class="hover:bg-sky-700 transition" v-for="(row, rowIndex) in props.data" :key="rowIndex">
 					<td v-for="column in selectedColumns" :key="column" class="border p-2">
 						{{ getColumnValue(row, column) }}
 					</td>

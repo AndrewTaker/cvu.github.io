@@ -3,11 +3,13 @@ import { ref } from 'vue';
 import { useDadata } from './composables/useDadata';
 import DataTable from './components/DataTable.vue'
 
-const { apiKey, apiSecret, data, saveApiKey, fetchData } = useDadata();
-const queries = ref<string>('');
-
+const { apiKey, data, saveApiKey, fetchData } = useDadata();
+const queries = ref<string>('5104909791, 5104004224, 5104909784');
+const loading = ref(false);
 const fetchMultipleData = async () => {
 	if (!queries.value) return;
+
+	loading.value = true;
 
 	const queryList = queries.value
 		.split(/[\n,]/)
@@ -15,14 +17,19 @@ const fetchMultipleData = async () => {
 		.filter(q => q.length > 0);
 
 	const allSuggestions: Suggestion[] = [];
-	for (const query of queryList) {
-		const response = await fetchData(query);
-		if (response?.suggestions) {
-			allSuggestions.push(...response.suggestions);
+	try {
+		for (const query of queryList) {
+			const response = await fetchData(query);
+			if (response?.suggestions) {
+				allSuggestions.push(...response.suggestions);
+			}
 		}
+		data.value = { suggestions: allSuggestions };
+	} catch (error) {
+		console.error('fetchMultiple err:', error);
+	} finally {
+		loading.value = false;
 	}
-
-	data.value = { suggestions: allSuggestions };
 };
 </script>
 
@@ -36,11 +43,18 @@ const fetchMultipleData = async () => {
 
 		<label class="block mb-2">Query:</label>
 		<textarea v-model="queries" class="border p-2 w-1/2 mb-4" placeholder="Enter query"></textarea>
+		<br>
 		<button @click="fetchMultipleData" class="bg-blue-500 text-white px-4 py-2">Fetch</button>
 
-		<div v-if="data" class="container mx-auto p-4">
+		<div v-if="loading" class="flex justify-center items-center h-64">
+			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+			<p class="ml-4"></p>
+		</div>
+
+		<div v-else-if="data" class="container mx-auto p-4">
 			<DataTable :data="data.suggestions" />
 		</div>
+
 		<p v-else>no data x(</p>
 	</div>
 </template>
