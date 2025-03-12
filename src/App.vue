@@ -6,6 +6,8 @@ import DataTable from './components/DataTable.vue'
 const { apiKey, data, saveApiKey, fetchData } = useDadata();
 const queries = ref<string>('5104909791, 5104004224, 5104909784');
 const loading = ref(false);
+const counter = ref<string>('');
+
 const fetchMultipleData = async () => {
 	if (!queries.value) return;
 
@@ -18,7 +20,8 @@ const fetchMultipleData = async () => {
 
 	const allSuggestions: Suggestion[] = [];
 	try {
-		for (const query of queryList) {
+		for (const [i, query] of queryList.entries()) {
+			counter.value = `${i}/${queryList.length}`
 			const response = await fetchData(query);
 			if (response?.suggestions) {
 				allSuggestions.push(...response.suggestions);
@@ -29,6 +32,7 @@ const fetchMultipleData = async () => {
 		console.error('fetchMultiple err:', error);
 	} finally {
 		loading.value = false;
+		counter.value = '';
 	}
 };
 </script>
@@ -37,18 +41,17 @@ const fetchMultipleData = async () => {
 	<div class="container mx-auto p-4">
 		<h1 class="text-xl font-bold mb-4">DaData API Explorer</h1>
 
-
 		<label class="block mb-2">API Key:</label>
-		<input v-model="apiKey" @input="saveApiKey" class="border w-1/2 p-2 mb-4" placeholder="Enter your API key" />
+		<input v-model="apiKey" @input="saveApiKey" class="border w-96 p-2 mb-4" placeholder="Enter your API key" />
 
 		<label class="block mb-2">Query:</label>
-		<textarea v-model="queries" class="border p-2 w-1/2 mb-4" placeholder="Enter query"></textarea>
+		<textarea v-model="queries" class="border p-2 w-96 mb-4" placeholder="Enter query"></textarea>
 		<br>
 		<button @click="fetchMultipleData" class="bg-blue-500 text-white px-4 py-2">Fetch</button>
 
 		<div v-if="loading" class="flex justify-center items-center h-64">
+			<p>{{ counter }}</p>
 			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-			<p class="ml-4"></p>
 		</div>
 
 		<div v-else-if="data" class="container mx-auto p-4">

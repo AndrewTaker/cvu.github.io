@@ -9,13 +9,22 @@ const props = defineProps({
 });
 
 const availableTags = [
-	{ tag: 'полное название', label: 'data.name.full_with_opf' },
+	{ tag: 'полное наименование', label: 'data.name.full_with_opf' },
+	{ tag: 'краткое наименование', label: 'data.name.short_with_opf' },
+	{ tag: 'окато', label: 'data.okato' },
+	{ tag: 'октмо', label: 'data.oktmo' },
+	{ tag: 'окпо', label: 'data.okpo' },
+	{ tag: 'окогу', label: 'data.okogu' },
+	{ tag: 'окфс', label: 'data.okfs' },
+	{ tag: 'оквэд', label: 'data.okved' },
+	{ tag: 'количество филиалов', label: 'data.branch_count' },
+	{ tag: 'тип подразделения', label: 'data.branch_type' },
 	{ tag: 'инн', label: 'data.inn' },
 	{ tag: 'кпп', label: 'data.kpp' },
-	{ tag: 'адрес', label: 'data.address.value' },
+	{ tag: 'адрес', label: 'data.address.unrestricted_value' },
 ];
 
-const selectedTags = ref<string[]>(['полное название', 'инн']);
+const selectedTags = ref<string[]>(['полное наименование', 'инн']);
 
 const selectedColumns = computed(() =>
 	availableTags
@@ -31,7 +40,6 @@ const toggleTag = (tag: string) => {
 
 
 const getColumnValue = (row, column) => {
-	console.log(`Fetching "${column}" from`, row);
 	return column.split('.').reduce((acc, key) => acc?.[key] ?? '', row);
 };
 
@@ -64,15 +72,10 @@ const downloadCSV = () => {
 </script>
 
 <template>
-	<div class="container mx-auto p-4">
-		<div class="mb-4">
-			<button @click="downloadCSV" class="px-4 py-2 bg-blue-500 text-white rounded-md">
-				Download CSV
-			</button>
-		</div>
+	<div class="container mx-3 p-4">
 
-		<div class="mb-4">
-			<div class="space-x-2">
+		<div class="flex justify-between mb-4">
+			<div class="space-x-2 border">
 				<span v-for="tag in availableTags" :key="tag"
 					class="bg-gray-200 px-2 py-1 rounded-full text-sm hover:bg-sky-700" :class="{
 						'bg-gray-200': !selectedTags.includes(tag.tag),
@@ -81,11 +84,17 @@ const downloadCSV = () => {
 					<button @click="toggleTag(tag.tag)" class="text-red-500 ml-1">{{ tag.tag }}</button>
 				</span>
 			</div>
+
+			<div class="mb-4">
+				<button @click="downloadCSV" class="px-4 py-2 bg-blue-500 text-white rounded-md right">
+					Download CSV
+				</button>
+			</div>
 		</div>
 
 		<table class="min-w-full border-collapse table-auto">
-			<thead>
-				<tr class="sticky top-0">
+			<thead class="sticky top-0">
+				<tr>
 					<th v-for="column, index in selectedColumns" :key="index" class="border p-2">
 						{{ getTagLabel(column) }}
 					</th>
