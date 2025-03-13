@@ -30,7 +30,7 @@ export const useDadata = () => {
   return { apiKey, data, saveApiKey, fetchData };
 };
 
-interface Suggestion {
+export interface Suggestion {
   value: string;
   unrestricted_value: string;
   data: {
