@@ -51,8 +51,8 @@ const fetchMultipleData = async () => {
 			воспользоваться <a href="https://dadata.ru/api/stat/"
 				class="text-blue-600 underline dark:text-blue-500 hover:no-underline">этим </a>эндпоинтом. Сейчас не
 			реализован весь вывод
-			данных, только самые важные ПРы приветствуются. <a
-				href="https://github.com/AndrewTaker/cvu.github.io">репозиторий</a>.</p>
+			данных, только самые важные. ПРы приветствуются. <a href="https://github.com/AndrewTaker/cvu.github.io"
+				class="text-blue-600 underline dark:text-blue-500 hover:no-underline">Репозиторий</a>.</p>
 		<div class="w-96 mx-auto bg-white shadow-sm rounded-lg border p-4">
 			<section class="space-y-4">
 				<div>

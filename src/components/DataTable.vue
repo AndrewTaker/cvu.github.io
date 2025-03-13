@@ -109,7 +109,7 @@ const sortedData = computed(() => {
 
 <template>
 	<div class="w-full p-4">
-		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sticky top-10">
+		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
 			<div class="flex flex-wrap gap-2">
 				<span v-for="tag in availableTags" :key="tag.tag" @click="toggleTag(tag.tag)"
 					class="px-3 py-1 text-sm font-medium rounded-full cursor-pointer transition" :class="{
@@ -129,9 +129,9 @@ const sortedData = computed(() => {
 			</button>
 		</div>
 
-		<div class="w-full overflow-x-auto rounded-lg shadow-sm border border-gray-200">
+		<div class="w-full overflow-auto rounded-lg shadow-sm border border-gray-200 max-h-[80vh]">
 			<table class="w-full">
-				<thead class="bg-gray-200 sticky top-0">
+				<thead class="bg-gray-200 sticky top-0 z-10">
 					<tr>
 						<th v-for="(column, index) in selectedColumns" :key="index" @click="sortTable(column)"
 							class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-300 transition">
