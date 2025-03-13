@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onUnmounted, onMounted } from 'vue';
 import { useDadata } from './composables/useDadata';
 import DataTable from './components/DataTable.vue';
+import type { Suggestion } from './composables/useDadata'
 
 const { apiKey, data, saveApiKey, fetchData } = useDadata();
 const queries = ref<string>('');

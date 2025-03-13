@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type Suggestion from 'composable/useDadata';
+import type { Suggestion } from './composable/useDadata';
 const props = defineProps({
 	data: {
 		type: Array as () => Suggestion[],
@@ -40,7 +40,7 @@ const toggleTag = (tag: string) => {
 };
 
 
-const getColumnValue = (row, column) => {
+const getColumnValue = (row: any, column: string) => {
 	return column.split('.').reduce((acc, key) => acc?.[key] ?? '', row);
 };
 
