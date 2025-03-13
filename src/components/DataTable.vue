@@ -25,7 +25,8 @@ const availableTags = [
 ];
 
 const selectedTags = ref<string[]>(['полное наименование', 'инн']);
-
+const sortKey = ref<string>('');
+const sortOrder = ref<'asc' | 'desc' | ''>('');
 const selectedColumns = computed(() =>
 	availableTags
 		.filter(tag => selectedTags.value.includes(tag.tag))
@@ -69,6 +70,41 @@ const downloadCSV = () => {
 	link.setAttribute('download', 'data.csv');
 	link.click();
 };
+
+const sortTable = (key: string) => {
+	if (sortKey.value === key) {
+		sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+	} else {
+		sortKey.value = key;
+		sortOrder.value = 'asc';
+	}
+};
+
+const searchQuery = ref<string>('');
+const sortedData = computed(() => {
+	let filteredData = props.data;
+
+	if (searchQuery.value) {
+		filteredData = filteredData.filter(row =>
+			selectedColumns.value.some(column =>
+				String(getColumnValue(row, column)).toLowerCase().includes(searchQuery.value.toLowerCase())
+			)
+		);
+	}
+
+	if (sortKey.value && sortOrder.value) {
+		filteredData = [...filteredData].sort((a, b) => {
+			const valueA = getColumnValue(a, sortKey.value);
+			const valueB = getColumnValue(b, sortKey.value);
+
+			if (valueA < valueB) return sortOrder.value === 'asc' ? -1 : 1;
+			if (valueA > valueB) return sortOrder.value === 'asc' ? 1 : -1;
+			return 0;
+		});
+	}
+
+	return filteredData;
+});
 </script>
 
 <template>
@@ -84,9 +120,12 @@ const downloadCSV = () => {
 				</span>
 			</div>
 
+			<input v-model="searchQuery" type="text" placeholder="Поиск"
+				class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
 			<button @click="downloadCSV"
 				class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
-				Download CSV
+				Скачать CSV
 			</button>
 		</div>
 
@@ -94,15 +133,18 @@ const downloadCSV = () => {
 			<table class="w-full">
 				<thead class="bg-gray-200 sticky top-0">
 					<tr>
-						<th v-for="(column, index) in selectedColumns" :key="index"
-							class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+						<th v-for="(column, index) in selectedColumns" :key="index" @click="sortTable(column)"
+							class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-300 transition">
 							{{ getTagLabel(column) }}
+							<span v-if="sortKey === column">
+								{{ sortOrder === 'asc' ? '▲' : '▼' }}
+							</span>
 						</th>
 					</tr>
 				</thead>
 
 				<tbody class="divide-y divide-gray-200">
-					<tr v-for="(row, rowIndex) in props.data" :key="rowIndex" class="hover:bg-gray-50 transition">
+					<tr v-for="(row, rowIndex) in sortedData" :key="rowIndex" class="hover:bg-gray-50 transition">
 						<td v-for="column in selectedColumns" :key="column" class="px-6 py-4 text-sm text-gray-700">
 							{{ getColumnValue(row, column) }}
 						</td>
