@@ -72,41 +72,43 @@ const downloadCSV = () => {
 </script>
 
 <template>
-	<div class="container mx-3 p-4">
-
-		<div class="flex justify-between mb-4">
-			<div class="space-x-2 border">
-				<span v-for="tag in availableTags" :key="tag"
-					class="bg-gray-200 px-2 py-1 rounded-full text-sm hover:bg-sky-700" :class="{
-						'bg-gray-200': !selectedTags.includes(tag.tag),
-						'bg-sky-700': selectedTags.includes(tag.tag)
+	<div class="w-full p-4">
+		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sticky top-10">
+			<div class="flex flex-wrap gap-2">
+				<span v-for="tag in availableTags" :key="tag.tag" @click="toggleTag(tag.tag)"
+					class="px-3 py-1 text-sm font-medium rounded-full cursor-pointer transition" :class="{
+						'bg-blue-100 text-blue-800 hover:bg-blue-200': !selectedTags.includes(tag.tag),
+						'bg-blue-600 text-white hover:bg-blue-700': selectedTags.includes(tag.tag),
 					}">
-					<button @click="toggleTag(tag.tag)" class="text-red-500 ml-1">{{ tag.tag }}</button>
+					{{ tag.tag }}
 				</span>
 			</div>
 
-			<div class="mb-4">
-				<button @click="downloadCSV" class="px-4 py-2 bg-blue-500 text-white rounded-md right">
-					Download CSV
-				</button>
-			</div>
+			<button @click="downloadCSV"
+				class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
+				Download CSV
+			</button>
 		</div>
 
-		<table class="min-w-full border-collapse table-auto">
-			<thead class="sticky top-0">
-				<tr>
-					<th v-for="column, index in selectedColumns" :key="index" class="border p-2">
-						{{ getTagLabel(column) }}
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="hover:bg-sky-700 transition" v-for="(row, rowIndex) in props.data" :key="rowIndex">
-					<td v-for="column in selectedColumns" :key="column" class="border p-2">
-						{{ getColumnValue(row, column) }}
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<div class="w-full overflow-x-auto rounded-lg shadow-sm border border-gray-200">
+			<table class="w-full">
+				<thead class="bg-gray-200 sticky top-0">
+					<tr>
+						<th v-for="(column, index) in selectedColumns" :key="index"
+							class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+							{{ getTagLabel(column) }}
+						</th>
+					</tr>
+				</thead>
+
+				<tbody class="divide-y divide-gray-200">
+					<tr v-for="(row, rowIndex) in props.data" :key="rowIndex" class="hover:bg-gray-50 transition">
+						<td v-for="column in selectedColumns" :key="column" class="px-6 py-4 text-sm text-gray-700">
+							{{ getColumnValue(row, column) }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </template>

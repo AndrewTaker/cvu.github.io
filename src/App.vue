@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onUnmounted, onMounted } from 'vue';
 import { useDadata } from './composables/useDadata';
-import DataTable from './components/DataTable.vue'
+import DataTable from './components/DataTable.vue';
 
 const { apiKey, data, saveApiKey, fetchData } = useDadata();
-const queries = ref<string>('5104909791, 5104004224, 5104909784');
+const queries = ref<string>('');
 const loading = ref(false);
 const counter = ref<string>('');
 
@@ -38,27 +38,55 @@ const fetchMultipleData = async () => {
 </script>
 
 <template>
-	<div class="container mx-auto p-4">
-		<h1 class="text-xl font-bold mb-4">DaData API Explorer</h1>
+	<div class="max-w-screen mx-auto p-6 space-y-6">
+		<h1 class="text-2xl font-bold text-center text-gray-800">DaData API Explorer</h1>
 
-		<label class="block mb-2">API Key:</label>
-		<input v-model="apiKey" @input="saveApiKey" class="border w-96 p-2 mb-4" placeholder="Enter your API key" />
+		<p class="mx-auto w-96 text-center">Работает только по <a href="https://dadata.ru/api/find-party/"
+				class="text-blue-600 underline dark:text-blue-500 hover:no-underline">этому</a>
+			эндпоинту.
+			Ключ
+			можно
+			взять в личном
+			кабинете. Ограничение по запросам - 10000 в день. Чтобы проверить текущий остаток по запросам можно
+			воспользоваться <a href="https://dadata.ru/api/stat/"
+				class="text-blue-600 underline dark:text-blue-500 hover:no-underline">этим </a>эндпоинтом. Сейчас не
+			реализован весь вывод
+			данных, только самые важные ПРы приветствуются. <a
+				href="https://github.com/AndrewTaker/cvu.github.io">репозиторий</a>.</p>
+		<div class="w-96 mx-auto bg-white shadow-sm rounded-lg border p-4">
+			<section class="space-y-4">
+				<div>
+					<label class="block text-sm font-medium text-gray-600 mb-1">API ключ:</label>
+					<input v-model="apiKey" @input="saveApiKey"
+						class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+						placeholder="API ключ из личного кабинета dadata.ru" />
+				</div>
 
-		<label class="block mb-2">Query:</label>
-		<textarea v-model="queries" class="border p-2 w-96 mb-4" placeholder="Enter query"></textarea>
-		<br>
-		<button @click="fetchMultipleData" class="bg-blue-500 text-white px-4 py-2">Fetch</button>
+				<div>
+					<label class="block text-sm font-medium text-gray-600 mb-1">Список ИНН:</label>
+					<textarea v-model="queries"
+						class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+						placeholder="Можно ввести через запятую или каждый новый ИНН с новой строки"
+						rows="3"></textarea>
+				</div>
 
-		<div v-if="loading" class="flex justify-center items-center h-64">
-			<p>{{ counter }}</p>
-			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+				<button @click="fetchMultipleData"
+					class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">
+					Отправить запрос
+				</button>
+			</section>
 		</div>
 
-		<div v-else-if="data" class="container mx-auto p-4">
+		<div v-if="loading" class="flex flex-col items-center justify-center h-40 space-y-4">
+			<p class="text-gray-500">{{ counter }}</p>
+			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500"></div>
+		</div>
+
+		<div v-else-if="data" class="bg-white shadow-sm rounded-lg border p-4 mx-auto w-full">
 			<DataTable :data="data.suggestions" />
 		</div>
 
-		<p v-else>no data x(</p>
+		<p v-else class="text-center text-gray-400">Пока нет данных</p>
 	</div>
 </template>
 
